@@ -1,70 +1,34 @@
-# Getting Started with Create React App
+# keepPreviousData: true (dùng cho phân trang)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# useInfiniteQuery  (dùng cho loadmore)
 
-## Available Scripts
+# isloading => state change
 
-In the project directory, you can run:
+# isFetching => function change
 
-### `npm start`
+# Dependent Queries
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```js
+// Get data user
+const { data: user } = useQuery(["user", email], getUserByEmail);
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+const userId = user?.id;
 
-### `npm test`
+// get user's project
+const { isIdle, data: projects } = useQuery(
+  ["projects", userId],
+  getProjectsByUser,
+  {
+    // The query will not execute until the userId exists
+    enabled: !!userId,
+  }
+);
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# staleTime và cacheTime
 
-### `npm run build`
+- staleTime: Thời gian data trong cache được tính là mới, tức là nếu data query này trong cache được tính là mới thì khi gọi query sẽ không call queryFuntion để lấy dữ liệu cập nhật vào cache nữa. "Còn mới thì gọi api làm gì 😃". Mặc định staleTime là 0, tức là cứ dùng query sẽ gọi đến queryFunction.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- cacheTime (default 5*60*1000 ms tức 5 phút): Thời gian data sẽ bị xóa ra khỏi bộ nhớ đệm. Có thể data đã "cũ" nhưng nó chưa bị xóa ra khỏi bộ nhớ đệm vì bạn set staleTime < cacheTime. Thường thì người ta sẽ set staleTime < cacheTime
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- nếu 2 query cùng key, query 1 set stale là 5s, tiếp tục gọi query 2 với state là 2s, thì nếu query 1 chưa chạy hết 5s mà gọi query 2 thì như k gọi vì data còn mới

@@ -21,6 +21,11 @@ export default function Header() {
                 Post
               </Typography>
             </Link>
+            <Link to="/infi-posts" style={{ textDecoration: "none", color: "#fff" }}>
+              <Typography variant="h6" component="span">
+              InfiniteQuery
+              </Typography>
+            </Link>
           </Box>
           {/* <ButtonLogin /> */}
         </Toolbar>

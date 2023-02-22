@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "https://jsonplaceholder.typicode.com/",
+  baseURL: "https://js-post-api.herokuapp.com/api/",
 });
 
 axiosClient.interceptors.request.use(
